@@ -1,0 +1,99 @@
+/* inserção de novos dados a nossa coleção de livros, incluindo um array e um objeto (subdocumento) como atributos*/
+db.livros.insertMany([
+    {titulo: "Lindzika: Facas e No-Scopes", preco: 150},
+    {titulo: "Lobos da 365bet", preco: 60},
+    {titulo: "Kofun: O Livro", preco: 50, autor: {autor_1: "Kofun", autor_2: "Olavo de Carvalho"}},
+    {titulo: "Manual do Luker do Luker: Do Básico ao Avançado", preco: 200},
+    {titulo: "Madrugada Quente", preco: 35.99, autor: ["Omala", "Theus", "Paulo"]}
+])
+
+/* update em array e em objeto */
+db.livros.updateOne(
+    {titulo: "Kofun: O Livro"},
+    {$set: {"autor.autor_1": "Kofunzinho"}}
+)
+
+db.livros.updateOne(
+    {titulo: "Madrugada Quente"},
+    {$set: {"autor.0": "Omala Pedrosa"}}
+)
+
+/* updateMany */
+db.livros.updateMany(
+    {preco: {$gte: 150}},
+    {$set: {preco: 149.99}}
+)
+
+/* o .sort organiza os documentos a partir do atributo especificado */
+db.livros.find(
+    {preco: {$exists: 1}},
+    {titulo: 1, preco: 1}
+).sort({
+    preco: 1
+})
+
+db.livros.find(
+    {preco: {$exists: 1}},
+    {titulo: 1, preco: 1}
+).sort({
+    preco: -1
+})
+
+/* .limit limita a quatidade de documentos retornado */
+db.livros.find(
+    {preco: {$exists: 1}},
+    {titulo: 1, preco: 1}
+).sort({
+    preco: 1
+}).limit(3)
+
+/* o .skip pula uma quatidade de documentos antes de nos dar o retorno */
+db.livros.find(
+    {preco: {$exists: 1}},
+    {titulo: 1, preco: 1}
+).sort({
+    preco: 1
+}).skip(2).limit(5)
+
+// Valores que "substituem" o equals($eq)
+
+ /* $inc incremeta um valor ao atributo enquanto $mul o multiplica pelo valor especificado */
+db.livros.updateMany(
+    {preco: {$gte: 140}},
+    {$inc: {preco: 10}}
+)
+
+db.livros.updateMany(
+    {preco: {$gte: 140}},
+    {$mul: {preco: 1.1}}
+)
+
+/* $min minimiza o valor do atributo uma vez que este for maior que o parâmetro passado e $max maximiza o que for menor */
+db.livros.updateMany(
+    {preco: {$gte: 140}},
+    {$min: {preco: 145}}
+)
+
+db.livros.updateMany(
+    {preco: {$lt: 145}},
+    {$set: {preco: 50}}
+)
+
+/* $unset elimina o atributo */
+db.livros.updateOne(
+    {titulo: "Kofun: O Livro"},
+    {$unset: {preco: ""}}
+)
+
+/* $rename renomeia atributos (CUIDADO, RENOMEAR UM ATRIBUTO COM UM NOME JÁ EXISTENTE NO DOCUMENTO IRÁ SOBRESCREVER O ATRIBUTO QUE RECEBIA ESSE NOME ORIGINALMENTE), consegue inclusive mover atributos de subdocumentos */
+db.livros.updateOne(
+    {titulo: "Kofun: O Livro"},
+    {$rename: {"autor.autor_1": "roteirista"}} // "autor_1" virá para o documento principal como "roteirista"
+)
+
+/* upsert é uma mistura de updade e insert, os documentos que tiverem o atributo irão atualiza-lo e os que não tiverem irão adiciona-lo */
+db.livros.updateMany(
+    {preco: {$gte: 150}},
+    {$set: {preco: 149.99}},
+    {upsert: true}
+)

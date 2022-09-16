@@ -1,0 +1,99 @@
+ /* similar ao use do SQL, a diferença é que se a tabela especificada não existir o Mongo irá cria-la */
+use banco_exemplo
+
+/* digamos que uma coleção é uma "pasta" do no nosso banco, e esta aloca documentos, a sintaxe para criar um documento então se dá por db.nome_da_colecao.InsertOne(documento), lembrando que se a coleção especificada não existir o Mongo irá cria-la */
+db.livros.insertOne({
+    titulo: "MongoDB Aulas",
+    ano_de_publicacao: 2022
+})
+
+db.livros.insertOne({
+    titulo: "MongoDB Aulas: O Inimigo Agora é OUTRO",
+    ano_de_publicacao: 2023
+})
+
+/* o findOne é um comando de consulta, é comparável ao select do SQL, aqui nós especificamos uma relação key-value e o comando nos retorna o documento que contenha essa relação, caso não especifiquemos nada será retornado o primeiro documento da coleção */
+db.livros.findOne({titulo: "MongoDB Aulas: O Inimigo Agora é OUTRO"})
+
+/* exemplo de um findOne que retorna atributos especificos, o primeiro parâmetro especifica o documento retornado e o segunda os campos retornados, nesse segundo parâmetro o 1 representa um booleano true, ou seja, o atributo é retornado, em caso de um booleano false ou omissão do atributo este não seria retornado */
+db.livros.findOne(
+    {titulo: "MongoDB Aulas: O Inimigo Agora é OUTRO"},
+    {titulo: 1, ano_de_publicacao: 1})
+
+/* que retorna todos os atributos exceto o titulo */
+db.livros.findOne(
+    {titulo: "MongoDB Aulas: O Inimigo Agora é OUTRO"},
+    {titulo: 0})
+
+/* o comando updateOne tem um nome bem auto-explicativo e recebe dois parâmetros separados por vírgula, o primeiro é a relação key-value que será usada para identificar o documento que sofrerá alteração (normalmente o id) e o segundo é o comando $set seguido pelos novos valores do documento entre chaves {} */
+db.livros.updateOne(
+    {titulo: "MongoDB Aulas: O Inimigo Agora é OUTRO"},
+    {$set: {ano_de_publicacao: 2025}}
+)
+
+/* o deleteOne é outro comando auto-explicativo, recebe um parâmetro similar ao do findOne, a diferença é que o documento retornado nesse caso é deletado */ 
+db.livros.deleteOne({titulo: "MongoDB Aulas"})
+
+// Mais sobre insert
+
+/* os documentos do MongoDB recebem um id aleatório automaticamente quando são criados, para adicionar um id manualmente basta adicionar um atributo de nome "_id" ao documento */
+db.livros.insertOne({
+    _id: 1
+    titulo: "MongoDB Aulas: O id diferenciado",
+    ano_de_publicacao: 2023
+})
+
+/* enquanto o insertOne adiciona um documento o insertMany faz o mesmo para um array de documentos */
+db.livros.insertMany([
+    {titulo: "The Lost Canvas Volume 1", preco: 16.99},
+    {titulo: "Tantas Histórias no Outro Lado do Espelho", preco: 30},
+    {titulo: "A Cabana", preco: 60}
+])
+
+/* em NoSQL nós podemos ter atributos multivalorados (subdocumentos) através dessa sintaxe, note que aqui teremos mais de um valor em um mesmo atributo, o que infrigiria a 1FN dos bancos de dados relacionais */
+db.livros.insertOne({
+    titulo: "LUVA DE PEDREIRO: VIDA E OBRA",
+    autor: {
+        autor_1: "Luva de Pedreiro",
+        autor_2: "RECEBA"
+    },
+    ano_de_publicacao: 2060,
+    preco: 100
+})
+
+// Mais sobre find
+
+/* diferente do findOne que retorna o primeiro documento que se encaixa no parâmetro especificado, o find retorna todos os documentos que se enquadram, enquanto o $gte significa "greater than or equals" se equivalendo ao >= do SQL, e sintaxes similares podem ser usadas para equals($eq), greater than($gt), less than($lt), less than or equals($lte) e not equal($ne) */
+db.livros.find(
+    {preco: {$gte: 60}},
+    {titulo: true, preco: true}
+)
+
+/* in($in) e not in($nin) através do auxílio de uma array cumprem aqui a mesma função que cumprem no SQL, buscando valores especificos de um atributo */
+db.livros.find(
+    {preco: {$in: [30, 60]}},
+    {titulo: true, preco: true}
+)
+
+/* tanto $and quanto o %or seguidos por um array nos possibilitam criar condicionais mais complexos */
+db.livros.find(
+    {$and: [
+        {preco: {$lte: 100}},
+        {ano_de_publicacao: 2060}
+    ]},
+    {titulo: 1, preco: 1}
+)
+
+db.livros.find(
+    {$or: [
+        {preco: {$lte: 20}},
+        {preco: {$gte: 60}}
+    ]},
+    {titulo: 1, preco: 1}
+)
+
+/* o parâmetro %exists retorna os documentos que tenham esse atributo */
+db.livros.find(
+    {ano_de_publicacao: {$exists: true}},
+    {titulo: 1}
+)

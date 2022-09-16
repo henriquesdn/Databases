@@ -1,0 +1,105 @@
+/* https://mystery.knightlab.com/ */
+
+/* Assasinato em 15 de janeiro de 2018 */
+
+select *
+from
+    crime_scene_report
+where
+    city = "SQL City"
+order by 
+    date desc;
+
+/* Dos crimes em 15 de janeiro só 1 foi assassinato, a descrição diz que as testemunhas moram em Northwestern Dr e Franklin Ave, sendo a segunda se chama Annabel */
+
+select *
+from
+    person
+where
+    address_street_name = "Franklin Ave";
+
+/* Annabel Miller
+id = 16371
+license_id = 490173	
+address_number = 103
+ssn = 318771143 */
+              
+select *
+from
+    interview
+where
+    person_id = 16371;
+
+/* Assassino fez academia com Annabel dia 9 de janeiro */
+
+select
+    get_fit_now_member.name,
+    get_fit_now_check_in.check_in_date,
+    get_fit_now_check_in.check_in_time,
+    get_fit_now_check_in.check_out_time
+from
+    get_fit_now_member
+inner join get_fit_now_check_in on
+    get_fit_now_member.id = get_fit_now_check_in.membership_id
+where
+    get_fit_now_check_in.check_in_date = 20180109;
+
+/* As únicas pessoas que fizeram academia no mesmo horário que Annabel naquele dia foram Joe Germuska e Jeremy Bowers */
+
+select *
+from
+    person
+where
+    name in ('Joe Germuska', 'Jeremy Bowers');
+
+select *
+from
+    income
+where
+    ssn in (138909730, 871539279);
+
+/* Jeremy deve na justiça */
+
+/* Jeremy é o assassino! */
+
+select *
+from
+    interview
+where
+    person_id = 67318;
+
+/* Mandante
+Cerca de 65-67 anos
+Ruiva
+Tem um Tesla Model S.
+Participou do SQL Symphony Concert 3 vezes em dezembro de 2017
+ */
+
+select *
+from
+    person
+inner join drivers_license on
+    person.license_id = drivers_license.id
+where
+    drivers_license.hair_color = "red" and
+    drivers_license.gender = "female" and
+    drivers_license.car_make = "Tesla" and
+    drivers_license.car_model = "Model S";
+
+/* Dois retornos na faixa de idade relatada:
+Regina George, id: 90700
+Miranda Priestly, id: 99716
+*/
+
+select
+    person.name,
+    facebook_event_checkin.event_name,
+    facebook_event_checkin.date
+from
+    person
+inner join facebook_event_checkin on
+    person.id = facebook_event_checkin.person_id
+where
+    person.id in (90700, 99716);
+
+/* Miranda Priestly é a mandante! */

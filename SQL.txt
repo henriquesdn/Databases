@@ -1,0 +1,197 @@
+use classicmodels;
+
+/* SELECT */
+select
+	productName,
+	productDescription,
+	buyPrice
+from
+	products
+where
+	buyPrice <= 100;
+
+/* SELECT em mais de uma tabela */
+select
+	products.productName,
+	products.buyPrice,
+	orderdetails.quantityOrdered,
+	orders.orderDate
+from
+	products,
+	orderdetails,
+	orders
+where 
+	products.productCode = orderdetails.productCode and
+	orderdetails.orderNumber = orders.orderNumber;
+
+/* AS */
+select
+	productName as 'Nome do Produto',
+	productDescription as 'Descrição',
+	buyPrice as 'Preço'
+from
+	products
+where
+	buyPrice >= 50;
+
+/* BETWEEN */
+select
+	productName 'Produto',
+	productDescription 'Descrição',
+	buyPrice 'Preço'
+from
+	products
+where
+	buyPrice between 30 and 80;
+
+/* LIKE */
+select
+	contactFirstName as 'Nome do Cliente',
+	contactLastName as 'Sobrenome',
+	phone as 'Telefone',
+	city as 'Cidade'
+from
+	customers
+where
+	city like '%Madri%';
+
+/* IN e NOT IN */
+select
+	contactFirstName as 'Nome',
+	contactLastName as 'Sobrenome',
+	phone as 'Telefone',
+	city as 'Cidade'
+from
+	customers
+where
+	city in ('Madrid', 'London');
+
+/* ORDER BY ASC ou DESC */
+select
+	customerNumber as 'ID do Cliente',
+	contactFirstName as 'Nome',
+	contactLastName as 'Sobrenome',
+	phone as 'Telefone',
+	city as 'Cidade'
+from
+	customers
+order by
+	customerNumber asc;
+
+/* LIMIT */
+select
+	productName as 'Nome do Produto',
+	productDescription as 'Descrição',
+	buyPrice as 'Preço'
+from
+	products
+where
+	buyPrice >= 50
+order by
+	buyPrice desc
+limit
+	0, 3;
+
+/* Funções de Agregação */
+select
+	min(quantityOrdered) as 'Menor Ordem'
+from
+	orderdetails;
+	
+select
+	max(quantityOrdered) 'Maior Ordem'
+from
+	orderdetails;
+
+select
+	count(quantityOrdered) 'Quantidade de Ordens'
+from
+	orderdetails;
+	
+select
+	sum(quantityOrdered) 'Itens Ordenados'
+from
+	orderdetails;
+	
+select
+	avg(quantityOrdered) as 'Média das Ordens'
+from
+	orderdetails;
+
+/* GROUP BY */
+select
+	orderDate as 'Data',
+	sum(quantityOrdered) as 'Produtos Ordenados'
+from
+	orderdetails
+inner join orders on
+	orderdetails.orderNumber = orders.orderNumber 
+group by
+	orderDate
+order by
+	orderDate desc;
+
+/* INNER JOIN */
+select
+	t1.productCode as 'Código do Produto',
+	t1.quantityOrdered as 'Quantidade Ordenada',
+	t1.priceEach as 'Preço Unitário',
+	t2.orderDate as 'Data da Ordem'
+from
+	orderdetails t1
+inner join orders t2 on
+	t1.orderNumber = t2.orderNumber
+where 
+	t1.orderNumber <= 10130;
+
+select
+	productCode as 'Código do Produto',
+	quantityOrdered as 'Quantidade Ordenada',
+	priceEach as 'Preço Unitário',
+	orderDate as 'Data da Ordem'
+from
+	orderdetails
+inner join orders on
+	orderdetails.orderNumber = orders.orderNumber
+where 
+	orderdetails.orderNumber <= 10130;
+
+select
+	t1.productName as 'Nome do Produto',
+	t1.buyPrice as 'Preço',
+	t2.quantityOrdered as 'Quantidade Ordenada',
+	t3.orderDate as 'Data da Ordem'
+from
+	products t1
+inner join orderdetails t2 on
+	t1.productCode = t2.productCode
+inner join orders t3 on
+	t2.orderNumber = t3.orderNumber
+where
+	t1.buyPrice <= 50
+order by
+	t1.buyPrice desc;
+
+/* LEFT JOIN e RIGHT JOIN */
+select
+	firstName as 'Nome',
+	lastName as 'Sobrenome',
+	addressLine2 as 'Endereço'
+from
+	employees as t1
+left join offices as t2 on
+	t1.officeCode = t2.officeCode;
+
+/* UPDATE */
+update customers
+set country = 'Estados Unidos'
+where country = 'USA';
+
+update customers
+set country = replace(country, 'Unidos', 'Unidos da América')
+where country = 'Estados Unidos';
+
+/* DELETE */
+delete
+from customers
+where customerNumber = 100;
